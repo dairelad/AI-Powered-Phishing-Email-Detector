@@ -114,16 +114,16 @@ class PhishingDetector:
         
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4",
                 messages=[
                     {"role": "system", "content": "You are a cybersecurity expert. Provide analysis in valid JSON format only."},
                     {"role": "user", "content": prompt}
                 ],
-                #response_format={ "type": "json_object" }  # Ensures JSON response
             )
             
             # Parse the JSON response
             try:
+                import pdb; pdb.set_trace()
                 analysis_result = json.loads(response.choices[0].message.content)
                 
                 # Validate the required fields

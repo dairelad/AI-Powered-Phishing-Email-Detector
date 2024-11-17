@@ -1,0 +1,7 @@
+Analysis Results:
+Rule-based Score: 0.2
+OpenAI Analysis Score: 0.765
+Combined Risk Score: 0.5954999999999999
+
+Detailed AI Analysis:
+{'risk_score': 0.9, 'threat_indicators': ['Urgent language', 'Indistinct recipient', 'Request for login credentials', 'Lack of specific account details', 'Potential link for credential harvesting'], 'reasoning': ['The email is marked with a high risk score due to multiple phishing indicators.', "The email uses urgent language ('If you don't act within 24 hours, your account will be suspended.') which is a common linguistic pattern found in phishing attempts.", "The indistinct 'Dear User' greeting indicates that the email could have been sent to multiple recipients, which is a characteristic of phishing emails.", 'The email prompts the recipient to enter their login credentials, which suggests a potential attempt at credential harvesting.', "The message lacks specifics about the account, such as the username or other details that the legitimate 'Security Team' should have. This lack of specificity signals a possible phishing attempt."], 'confidence': 0.85, 'recommended_actions': ['Do not click on the link in the email.', 'Do not provide any login credentials or personal information.', 'Contact your service provider directly to confirm the validity of the email.', 'Report the email as spam or phishing attempt to your email provider.'], 'timestamp': '2024-11-17T21:44:10.382960', 'model_version': 'gpt-4', 'adjusted_risk_score': 0.765}
