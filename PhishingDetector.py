@@ -6,13 +6,12 @@ Date: November 2024
 '''
 
 import configparser
-import os
 from typing import Dict, List
 import openai
 import datetime
 import json
 import logging
-
+import httpx
 
 class PhishingDetector:
     def __init__(self):
@@ -20,7 +19,7 @@ class PhishingDetector:
             config = configparser.ConfigParser()
             config.read('config.ini')
             openai_key = config['api']['openai_key']
-            print(f"OpenAI API Key from INI: {openai_key[:5]}...")
+            print(f"OpenAI API Key Loaded from INI Config: {openai_key[:5]}...\n")
         except Exception as e:
             print(f"Error reading INI config: {e}")
             return
@@ -31,6 +30,27 @@ class PhishingDetector:
             'requests':['verify your account', 'confirm your identity'],
             'credentials':['login', 'password', 'username']
         }
+
+        proxy = False
+        if proxy:
+            http_proxy = config['proxy']['HTTP_PROXY']
+            https_proxy = config['proxy']['HTTPS_PROXY']
+            proxies = {
+                "http://": http_proxy,
+                "https://": https_proxy,
+            }
+
+            # try:
+            #     print(proxies)
+            #     response = httpx.get("https://api.openai.com/v1/models", verify=False, timeout=10.0)
+            #     print("Connection successful:", response.status_code)
+            #     print(response.json())
+            # except httpx.RequestError as e:
+            #     print("Request failed:", e)
+
+            self.client = openai.OpenAI(api_key=openai_key, http_client=httpx.Client(proxies=proxies, verify=False))
+        else: 
+            self.client = openai.OpenAI(api_key=openai_key, http_client=httpx.Client(verify=False)) # temp disable ssl verification
 
     def analyze_email(self, email_content: str) -> Dict: #python hint, email_content takes a string as input and function returns a dict
         """
@@ -71,15 +91,16 @@ class PhishingDetector:
         Returns structured analysis including risk score, identified threats,
         and detailed reasoning.
         """
+
         prompt = f"""
         Analyze this email for phishing attempts. Provide analysis in the following JSON format:
-        {
+        {{
             "risk_score": (float between 0-1),
             "threat_indicators": [list of specific suspicious elements found],
             "reasoning": [list of detailed explanations],
             "confidence": (float between 0-1),
             "recommended_actions": [list of recommended user actions]
-        }
+        }}
         
         Consider the following in your analysis:
         1. Linguistic patterns and urgency
@@ -92,13 +113,13 @@ class PhishingDetector:
         """
         
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You are a cybersecurity expert. Provide analysis in valid JSON format only."},
-                    {"role": "user", "content": prompt.format(content=content)}
+                    {"role": "user", "content": prompt}
                 ],
-                response_format={ "type": "json_object" }  # Ensures JSON response
+                #response_format={ "type": "json_object" }  # Ensures JSON response
             )
             
             # Parse the JSON response
@@ -179,7 +200,7 @@ if __name__ == "__main__":
     results = detector.analyze_email(sample_email)
     print(f"Analysis Results:")
     print(f"Rule-based Score: {results['rule_based_score']}")
-    print(f"AI Analysis Score: {results['ai_analysis']['risk_score']}")
+    print(f"OpenAI Analysis Score: {results['ai_analysis']['risk_score']}")
     print(f"Combined Risk Score: {results['combined_risk']}")
     print(f"\nDetailed AI Analysis:")
     print(results['ai_analysis']['analysis'])
