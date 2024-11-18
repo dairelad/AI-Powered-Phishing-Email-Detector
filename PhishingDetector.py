@@ -40,6 +40,7 @@ class PhishingDetector:
                 "https://": https_proxy,
             }
 
+            ## Code below can be used to troubleshoot connection from local machine to openai API
             # try:
             #     print(proxies)
             #     response = httpx.get("https://api.openai.com/v1/models", verify=False, timeout=10.0)
