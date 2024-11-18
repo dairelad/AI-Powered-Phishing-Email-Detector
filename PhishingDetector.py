@@ -124,7 +124,6 @@ class PhishingDetector:
             
             # Parse the JSON response
             try:
-                import pdb; pdb.set_trace()
                 analysis_result = json.loads(response.choices[0].message.content)
                 
                 # Validate the required fields
